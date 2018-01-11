@@ -6,11 +6,14 @@ const hotOpt = 'webpack-hot-middleware/client?reload=true';
 const common = require('./utils/common');
 const publickPath = path.resolve(__dirname, './public');
 const OpenBrowserPlugin = require('open-browser-webpack-plugin');
+//复制文件
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const WriteFilePlugin = require('write-file-webpack-plugin');
 const entryJson = {};
 common.readDirSync(publickPath).forEach((e,i) => {
   entryJson[e] = [`./public/${e}`,hotOpt];
 });
-
+console.log('ppppppp', `${path.resolve(__dirname, 'src')}/index.js`)
 module.exports = {
   // entry: {
   //   index: ['./public/home',hotOpt],
@@ -27,6 +30,23 @@ module.exports = {
     }),
     new webpack.HotModuleReplacementPlugin(),
     // new OpenBrowserPlugin({ url: 'http://localhost:3000' }),
+
+    //引入全局jq
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery',
+      'window.jQuery': 'jquery',
+      'window.$': 'jquery',
+    }),
+
+
+    new CopyWebpackPlugin([
+      // { from: `${path.resolve(__dirname, 'src')}/index.js`, to: `${path.resolve(__dirname, 'static')}` },
+      { from: `${path.resolve(__dirname, 'src')}/index.js`, to: 'static/libs' },
+    ]),
+    //强行写文件  但是会老是update
+    // new WriteFilePlugin(),
+
   ],
   output: {
     filename: '[name].bundle.js',
@@ -35,6 +55,17 @@ module.exports = {
   },
   module: {
     rules: [
+      //全局引入jq
+      {
+        test: require.resolve('jquery'),
+        use: [{
+          loader: 'expose-loader',
+          options: 'jQuery'
+        },{
+          loader: 'expose-loader',
+          options: '$'
+        }]
+      },
       {
         test: /\.js$/,
         use: [

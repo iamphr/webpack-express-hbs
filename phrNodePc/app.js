@@ -21,7 +21,7 @@ app.use(webpackDevMiddleware(compiler, {
   noInfo: true,
   publicPath: config.output.publicPath
 }));
-app.use(require("webpack-hot-middleware")(compiler));
+// app.use(require("webpack-hot-middleware")(compiler));
 
 
 const hbs = exphbs.create({
